@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fauna · Monte a cesta do seu pet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde:#77B38D; --verde-fundo:#468E77; --amarelo:#F2EF6E; --laranja:#FC8100;
+    --tinta:#1f3a30; --tinta-suave:#4a6b5e; --creme:#f6f8f4; --branco:#ffffff;
+    --linha:#e2ebe4; --sombra:0 18px 40px -18px rgba(31,58,48,.35);
+    --disp:'Josefin Sans',sans-serif; --corpo:'Open Sans',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:var(--corpo); color:var(--tinta); line-height:1.5;
+    background:
+      radial-gradient(1200px 600px at 90% -10%, rgba(119,179,141,.18), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(242,239,110,.22), transparent 55%),
+      var(--creme);
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .app{width:100%; max-width:520px}
+
+  /* Marca */
+  .marca{display:flex; align-items:center; gap:10px; justify-content:center; margin-bottom:14px}
+  .wordmark{font-family:var(--disp); font-weight:700; letter-spacing:.28em; font-size:26px; color:var(--verde-fundo); position:relative; padding-right:4px}
+  .wordmark::before{content:""; position:absolute; left:2px; right:8px; top:-9px; height:12px; border:2.5px solid var(--verde); border-bottom:none; border-radius:60px 60px 0 0; opacity:.55}
+  .wordmark .dot{position:absolute; top:-13px; right:-3px; width:8px; height:8px; border-radius:50%; background:var(--amarelo); box-shadow:0 0 0 2px var(--branco)}
+
+  .cartao{background:var(--branco); border:1px solid var(--linha); border-radius:24px; box-shadow:var(--sombra); overflow:hidden}
+  .topo{padding:22px 24px 16px; background:linear-gradient(180deg,rgba(119,179,141,.10),transparent)}
+  .kicker{font-family:var(--disp); text-transform:uppercase; letter-spacing:.18em; font-size:11px; font-weight:600; color:var(--verde-fundo); display:flex; align-items:center; gap:7px}
+  .kicker .paw{width:14px;height:14px;flex:none}
+  h1{font-family:var(--disp); font-weight:700; font-size:26px; line-height:1.12; margin-top:6px; color:var(--tinta)}
+  h1 .nome{color:var(--laranja)}
+  .sub{color:var(--tinta-suave); font-size:14px; margin-top:6px}
+
+  /* Progresso */
+  .prog{display:flex; gap:5px; padding:0 24px; margin-top:14px}
+  .prog i{height:4px; flex:1; border-radius:99px; background:var(--linha); transition:background .3s}
+  .prog i.on{background:var(--verde)}
+
+  .corpo{padding:20px 24px 24px}
+  .pergunta{font-family:var(--disp); font-weight:600; font-size:20px; margin-bottom:4px}
+  .ajuda{color:var(--tinta-suave); font-size:13.5px; margin-bottom:16px}
+
+  .opcoes{display:grid; gap:10px}
+  .opcoes.duo{grid-template-columns:1fr 1fr}
+  .opt{appearance:none; border:1.5px solid var(--linha); background:var(--branco); border-radius:16px; padding:15px 16px; text-align:left; cursor:pointer; font-family:var(--corpo); font-size:15px; color:var(--tinta); display:flex; align-items:center; gap:12px; transition:border-color .18s, transform .12s, background .18s}
+  .opt:hover{border-color:var(--verde); background:#f7fbf8}
+  .opt:active{transform:scale(.985)}
+  .opt.sel{border-color:var(--verde-fundo); background:#eef7f1; box-shadow:inset 0 0 0 1px var(--verde-fundo)}
+  .opt .emo{font-size:22px; line-height:1; width:26px; text-align:center; flex:none}
+  .opt .tt{font-weight:600}
+  .opt .dd{display:block; font-size:12.5px; color:var(--tinta-suave); font-weight:400; margin-top:1px}
+
+  /* Peso */
+  .peso-wrap{text-align:center; padding:6px 0 4px}
+  .peso-val{font-family:var(--disp); font-weight:700; font-size:52px; color:var(--verde-fundo); line-height:1}
+  .peso-val small{font-size:20px; color:var(--tinta-suave); font-weight:500; margin-left:4px}
+  input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:8px; border-radius:99px; margin-top:20px;
+    background:linear-gradient(90deg,var(--verde) 0%,var(--verde) var(--pct,30%),var(--linha) var(--pct,30%),var(--linha) 100%); outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:26px; height:26px; border-radius:50%; background:var(--branco); border:3px solid var(--verde-fundo); box-shadow:0 3px 8px rgba(31,58,48,.25); cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:26px; height:26px; border-radius:50%; background:var(--branco); border:3px solid var(--verde-fundo); cursor:pointer}
+  .escala{display:flex; justify-content:space-between; font-size:11.5px; color:var(--tinta-suave); margin-top:8px}
+
+  /* Nome input */
+  .campo{width:100%; border:1.5px solid var(--linha); border-radius:16px; padding:15px 16px; font-family:var(--corpo); font-size:16px; color:var(--tinta)}
+  .campo:focus{outline:none; border-color:var(--verde-fundo); box-shadow:inset 0 0 0 1px var(--verde-fundo)}
+
+  .barra{display:flex; gap:10px; margin-top:18px}
+  .btn{appearance:none; border:none; cursor:pointer; font-family:var(--disp); font-weight:600; font-size:15px; letter-spacing:.02em; border-radius:14px; padding:14px 18px; transition:transform .12s, filter .18s}
+  .btn:active{transform:scale(.98)}
+  .btn-primario{background:var(--verde-fundo); color:#fff; flex:1}
+  .btn-primario:hover{filter:brightness(1.06)}
+  .btn-primario:disabled{opacity:.45; cursor:not-allowed; filter:none}
+  .btn-voltar{background:transparent; color:var(--tinta-suave); padding:14px 10px}
+  .btn-voltar:hover{color:var(--tinta)}
+
+  /* Resultado */
+  .res-topo{background:linear-gradient(180deg,var(--verde-fundo),#3c7d68); color:#fff; padding:22px 24px}
+  .res-topo .kicker{color:#dff0e6}
+  .res-topo h2{font-family:var(--disp); font-weight:700; font-size:24px; margin-top:6px}
+  .res-topo h2 .nome{color:var(--amarelo)}
+  .estim{display:flex; gap:10px; margin-top:16px}
+  .estim .box{flex:1; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); border-radius:14px; padding:12px 12px}
+  .estim .n{font-family:var(--disp); font-weight:700; font-size:22px}
+  .estim .l{font-size:11.5px; color:#dff0e6; margin-top:2px; text-transform:uppercase; letter-spacing:.08em}
+
+  .cesta{padding:20px 24px 6px}
+  .cesta h3{font-family:var(--disp); font-weight:600; font-size:14px; text-transform:uppercase; letter-spacing:.1em; color:var(--verde-fundo); margin-bottom:12px; display:flex; align-items:center; gap:8px}
+  .item{display:flex; align-items:center; gap:13px; padding:13px 0; border-bottom:1px solid var(--linha); opacity:0; transform:translateY(8px); animation:sobe .45s forwards}
+  @keyframes sobe{to{opacity:1; transform:none}}
+  .item .ic{width:44px; height:44px; border-radius:12px; background:var(--creme); border:1px solid var(--linha); display:flex; align-items:center; justify-content:center; font-size:22px; flex:none}
+  .item .meio{flex:1; min-width:0}
+  .item .nm{font-weight:700; font-size:15px}
+  .item .ds{font-size:12.5px; color:var(--tinta-suave)}
+  .item .pr{font-family:var(--disp); font-weight:600; color:var(--verde-fundo); text-align:right; font-size:14px; flex:none}
+  .item .pr small{display:block; font-family:var(--corpo); font-weight:400; color:var(--tinta-suave); font-size:11px}
+
+  .total{display:flex; justify-content:space-between; align-items:baseline; padding:16px 24px; margin-top:4px}
+  .total .lab{font-size:13px; color:var(--tinta-suave)}
+  .total .val{font-family:var(--disp); font-weight:700; font-size:30px; color:var(--tinta)}
+  .total .val small{font-size:14px; color:var(--tinta-suave); font-weight:500}
+
+  .nota{margin:0 24px 18px; background:#fff8e8; border:1px solid #f3e6bf; border-radius:14px; padding:12px 14px; font-size:12.5px; color:#7a5a12; display:flex; gap:9px}
+  .nota .warn{flex:none}
+  .nota.consulta{background:#eef7f1; border-color:#cfe6d8; color:#2f5c48}
+
+  .cta{padding:4px 24px 24px}
+  .btn-wpp{display:flex; align-items:center; justify-content:center; gap:10px; width:100%; background:var(--laranja); color:#fff; text-decoration:none; font-family:var(--disp); font-weight:600; font-size:16px; border-radius:16px; padding:16px; transition:filter .18s, transform .12s}
+  .btn-wpp:hover{filter:brightness(1.05)} .btn-wpp:active{transform:scale(.98)}
+  .refazer{display:block; width:100%; text-align:center; margin-top:12px; background:none; border:none; color:var(--tinta-suave); font-family:var(--corpo); font-size:13.5px; cursor:pointer; text-decoration:underline}
+  .rodape{text-align:center; color:var(--tinta-suave); font-size:11.5px; margin-top:16px; line-height:1.6}
+
+  .fade{animation:fade .32s ease}
+  @keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+  @media (max-width:400px){ h1{font-size:23px} .peso-val{font-size:44px} }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="marca"><span class="wordmark">FAUNA<span class="dot"></span></span></div>
+
+  <div class="cartao" id="cartao">
+    <div class="topo">
+      <div class="kicker">
+        <svg class="paw" viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="9" r="2.1"/><circle cx="12" cy="6.5" r="2.1"/><circle cx="18" cy="9" r="2.1"/><path d="M12 11c-3 0-5.5 2.3-5.5 4.6 0 1.7 1.4 2.6 3 2.6 1 0 1.7-.5 2.5-.5s1.5.5 2.5.5c1.6 0 3-.9 3-2.6C17.5 13.3 15 11 12 11z"/></svg>
+        Nutrição natural feita pra ele
+      </div>
+      <h1 id="titulo">Monte a cesta do seu pet</h1>
+      <p class="sub" id="subtitulo">Responda 5 perguntinhas e eu monto a semana ideal — receitas certas e quantidade na medida.</p>
+    </div>
+    <div class="prog" id="prog"></div>
+    <div class="corpo" id="corpo"></div>
+  </div>
+
+  <p class="rodape">Feito com amor pela <strong>Fauna</strong> · Ingredientes naturais, sem corantes ou conservantes.</p>
+</div>
+
+<script>
+/* ==== CONFIG — a Flavia edita aqui ==== */
+const FAUNA_WHATSAPP = "554132058955"; // (41) 3205-8955 // coloque o número com DDI+DDD, ex: 5541999998888
+/* ====================================== */
+
+const P = { dog300:17.97, dog800:47.92, cat100:8.00 };
+
+const RECEITAS = {
+  caoSaudavel:[
+    {id:'manu',nome:'Manu Comilona',prot:'Bovina',emo:'🐮'},
+    {id:'nina',nome:'Nina Exigente',prot:'Frango',emo:'🐔'},
+    {id:'lola',nome:'Lola Leal',prot:'Tilápia',emo:'🐟'},
+    {id:'tocaia',nome:'Tocaia Animada',prot:'Suína',emo:'🐷'},
+  ],
+  caoPeso:[
+    {id:'dentinho',nome:'Dentinho Fit',prot:'Emagrecimento',emo:'🎾'},
+    {id:'bruce',nome:'Bruce Equilibrado',prot:'Baixa gordura',emo:'🥦'},
+  ],
+  caoSens:[
+    {id:'pepe',nome:'Pepe Sensível',prot:'Peixe',emo:'🐟'},
+    {id:'mabel',nome:'Mabel Delicada',prot:'Suíno',emo:'🐷'},
+    {id:'bruce',nome:'Bruce Equilibrado',prot:'Baixa gordura',emo:'🥦'},
+  ],
+  gato:[
+    {id:'nora',nome:'Nora Zen',prot:'Bovina',emo:'🐮'},
+    {id:'flora',nome:'Flora Brincalhona',prot:'Frango',emo:'🐔'},
+    {id:'mima',nome:'Mima Especial',prot:'Suína',emo:'🐷'},
+  ],
+};
+
+const S = { especie:null, nome:'', peso:null, fase:null, atividade:null, necessidade:null, receita:null };
+let passo = 0;
+
+const corpo = document.getElementById('corpo');
+const prog  = document.getElementById('prog');
+const tituloEl = document.getElementById('titulo');
+const subEl = document.getElementById('subtitulo');
+
+function fluxo(){
+  // define os passos conforme espécie/necessidade
+  const base = ['especie','nome','peso','fase'];
+  if(S.especie==='cao') base.push('atividade');
+  base.push('necessidade');
+  const precisaEscolher = S.necessidade==='nenhuma' || S.necessidade==='peso' || S.necessidade==='sens';
+  if(precisaEscolher) base.push('receita');
+  base.push('resultado');
+  return base;
+}
+function render(){
+  const f = fluxo();
+  const etapa = f[passo];
+  const totalPontos = f.length-1;
+  prog.innerHTML = '';
+  for(let i=0;i<totalPontos;i++){ const b=document.createElement('i'); if(i<passo) b.className='on'; prog.appendChild(b); }
+  corpo.classList.remove('fade'); void corpo.offsetWidth; corpo.classList.add('fade');
+  ({especie:pEspecie,nome:pNome,peso:pPeso,fase:pFase,atividade:pAtividade,necessidade:pNecessidade,receita:pReceita,resultado:pResultado}[etapa])();
+}
+function avancar(){ passo++; render(); }
+function voltar(){ if(passo>0){ passo--; render(); } }
+
+function opt(html, onClick, sel){
+  const b=document.createElement('button'); b.className='opt'+(sel?' sel':''); b.innerHTML=html; b.onclick=onClick; return b;
+}
+function nomePet(){ return S.nome ? S.nome : (S.especie==='gato'?'seu gato':'seu cão'); }
+function barra(podeAvancar, rotulo='Continuar'){
+  const wrap=document.createElement('div'); wrap.className='barra';
+  if(passo>0){ const v=document.createElement('button'); v.className='btn btn-voltar'; v.textContent='Voltar'; v.onclick=voltar; wrap.appendChild(v); }
+  const n=document.createElement('button'); n.className='btn btn-primario'; n.textContent=rotulo; n.disabled=!podeAvancar; n.onclick=avancar; wrap.appendChild(n);
+  return wrap;
+}
+
+/* ---- Passos ---- */
+function pEspecie(){
+  tituloEl.innerHTML='Monte a cesta do seu pet'; subEl.textContent='Vamos começar: pra quem é a comidinha?';
+  corpo.innerHTML='<div class="pergunta">Seu pet é...</div><div class="ajuda">Toque pra escolher.</div>';
+  const g=document.createElement('div'); g.className='opcoes duo';
+  g.appendChild(opt('<span class="emo">🐶</span><span class="tt">Cão</span>',()=>{S.especie='cao';S.receita=null;avancar();},S.especie==='cao'));
+  g.appendChild(opt('<span class="emo">🐱</span><span class="tt">Gato</span>',()=>{S.especie='gato';S.receita=null;S.atividade=null;avancar();},S.especie==='gato'));
+  corpo.appendChild(g);
+}
+function pNome(){
+  subEl.textContent='Pra deixar a cesta com a cara dele.';
+  corpo.innerHTML='<div class="pergunta">Como '+(S.especie==='gato'?'ela(e)':'ele(a)')+' se chama?</div><div class="ajuda">Opcional — pode pular.</div>';
+  const inp=document.createElement('input'); inp.className='campo'; inp.placeholder='Ex.: Nina'; inp.value=S.nome; inp.maxLength=24;
+  inp.oninput=e=>S.nome=e.target.value.trim();
+  inp.onkeydown=e=>{ if(e.key==='Enter') avancar(); };
+  corpo.appendChild(inp);
+  corpo.appendChild(barra(true, S.nome?'Continuar':'Pular'));
+  setTimeout(()=>inp.focus(),120);
+}
+function pPeso(){
+  subEl.textContent='O peso define a quantidade certa por dia.';
+  const nm = S.nome||'ele(a)';
+  corpo.innerHTML='<div class="pergunta">Quanto '+nm+' pesa?</div><div class="ajuda">Arraste até o peso aproximado.</div>';
+  const max = S.especie==='gato'?12:60;
+  if(S.peso==null) S.peso = S.especie==='gato'?4:10;
+  const wrap=document.createElement('div'); wrap.className='peso-wrap';
+  wrap.innerHTML='<div class="peso-val"><span id="pv">'+S.peso+'</span><small>kg</small></div>';
+  const r=document.createElement('input'); r.type='range'; r.min='1'; r.max=String(max); r.step=(S.especie==='gato'?'0.5':'1'); r.value=S.peso;
+  const setPct=()=>{ r.style.setProperty('--pct', ((r.value-1)/(max-1)*100)+'%'); };
+  r.oninput=e=>{ S.peso=parseFloat(e.target.value); document.getElementById('pv').textContent=S.peso; setPct(); };
+  wrap.appendChild(r);
+  const esc=document.createElement('div'); esc.className='escala'; esc.innerHTML='<span>1 kg</span><span>'+max+' kg</span>';
+  wrap.appendChild(esc);
+  corpo.appendChild(wrap); setPct();
+  corpo.appendChild(barra(true));
+}
+function pFase(){
+  subEl.textContent='A fase da vida ajusta a porção.';
+  corpo.innerHTML='<div class="pergunta">Qual a fase '+(S.nome?'d'+(S.especie==='gato'?'a ':'o ')+S.nome:'do seu pet')+'?</div><div class="ajuda">Escolha a idade aproximada.</div>';
+  const g=document.createElement('div'); g.className='opcoes';
+  const fases=[['filhote','🍼','Filhote','Até ~12 meses'],['adulto','⭐','Adulto','1 a 7 anos'],['idoso','🌙','Idoso','7+ anos']];
+  fases.forEach(([id,e,t,d])=>g.appendChild(opt('<span class="emo">'+e+'</span><span><span class="tt">'+t+'</span><span class="dd">'+d+'</span></span>',()=>{S.fase=id;avancar();},S.fase===id)));
+  corpo.appendChild(g);
+}
+function pAtividade(){
+  subEl.textContent='Cães mais agitados gastam mais energia.';
+  corpo.innerHTML='<div class="pergunta">Como é o pique '+(S.nome?'d'+'o '+S.nome:'dele')+'?</div><div class="ajuda">No dia a dia.</div>';
+  const g=document.createElement('div'); g.className='opcoes';
+  const ns=[['tranquilo','😌','Tranquilo','Passeios curtos, mais soninho'],['normal','🐕','Normal','Passeios e brincadeiras diárias'],['agitado','⚡','Agitado','Corre e brinca muito']];
+  ns.forEach(([id,e,t,d])=>g.appendChild(opt('<span class="emo">'+e+'</span><span><span class="tt">'+t+'</span><span class="dd">'+d+'</span></span>',()=>{S.atividade=id;avancar();},S.atividade===id)));
+  corpo.appendChild(g);
+}
+function pNecessidade(){
+  subEl.textContent='Assim eu escolho as receitas certas.';
+  corpo.innerHTML='<div class="pergunta">'+(S.nome||'Seu pet')+' tem alguma necessidade especial?</div><div class="ajuda">Se tiver dúvida, escolha "Nenhuma".</div>';
+  const g=document.createElement('div'); g.className='opcoes';
+  let itens=[['nenhuma','✅','Nenhuma','Pet saudável, sem restrições']];
+  if(S.especie==='cao'){
+    itens.push(['sens','🌿','Sensibilidade ou alergia','Receitas de dessensibilização']);
+    itens.push(['peso','🎾','Controle de peso','Dieta mais leve']);
+    itens.push(['diabetes','🩺','Diabetes','Acompanhamento especial']);
+  }
+  itens.push(['prescricao','📋','Tenho prescrição do vet','Dieta personalizada']);
+  itens.forEach(([id,e,t,d])=>g.appendChild(opt('<span class="emo">'+e+'</span><span><span class="tt">'+t+'</span><span class="dd">'+d+'</span></span>',()=>{S.necessidade=id;S.receita=null;avancar();},S.necessidade===id)));
+  corpo.appendChild(g);
+}
+function listaReceitas(){
+  if(S.especie==='gato') return RECEITAS.gato;
+  if(S.necessidade==='peso') return RECEITAS.caoPeso;
+  if(S.necessidade==='sens') return RECEITAS.caoSens;
+  return RECEITAS.caoSaudavel;
+}
+function pReceita(){
+  subEl.textContent='Pode variar as proteínas durante a semana.';
+  const lista=listaReceitas();
+  corpo.innerHTML='<div class="pergunta">Qual receita '+(S.nome?'d'+(S.especie==='gato'?'a ':'o ')+S.nome:'você prefere')+'?</div><div class="ajuda">Escolha a favorita — dá pra alternar depois.</div>';
+  const g=document.createElement('div'); g.className='opcoes';
+  lista.forEach(r=>g.appendChild(opt('<span class="emo">'+r.emo+'</span><span><span class="tt">'+r.nome+'</span><span class="dd">'+r.prot+'</span></span>',()=>{S.receita=r;avancar();},S.receita&&S.receita.id===r.id)));
+  if(lista.length>1){
+    g.appendChild(opt('<span class="emo">🔄</span><span><span class="tt">Quero variar</span><span class="dd">Um rodízio de proteínas</span></span>',()=>{S.receita={id:'rodizio',nome:'Rodízio de receitas',prot:'Variado',emo:'🔄'};avancar();},S.receita&&S.receita.id==='rodizio'));
+  }
+  corpo.appendChild(g);
+}
+
+/* ---- Cálculo ---- */
+function fatorDiario(){
+  if(S.especie==='gato'){ return S.fase==='filhote'?0.045 : S.fase==='idoso'?0.025 : 0.03; }
+  if(S.necessidade==='peso') return 0.02;
+  if(S.fase==='filhote') return 0.05;
+  if(S.fase==='idoso') return 0.02;
+  return S.atividade==='tranquilo'?0.02 : S.atividade==='agitado'?0.03 : 0.025;
+}
+function calcular(){
+  const diario = Math.round(S.peso * fatorDiario() * 1000); // g/dia
+  const semanal = diario*7;
+  let itens=[], total=0;
+  if(S.especie==='gato'){
+    const n=Math.max(1,Math.ceil(semanal/100));
+    itens.push({nome:S.receita.nome, emo:S.receita.emo, qtd:n+'× pote 100g', preco:n*P.cat100});
+    total=n*P.cat100;
+  } else {
+    let n800=Math.floor(semanal/800); let rem=semanal-n800*800; let n300=Math.ceil(rem/300);
+    if(n300>=3){ n800++; n300=0; } if(n800===0&&n300===0){ n300=1; }
+    if(n800>0){ itens.push({nome:S.receita.nome, emo:S.receita.emo, qtd:n800+'× pote 800g', preco:n800*P.dog800}); total+=n800*P.dog800; }
+    if(n300>0){ itens.push({nome: n800>0?'Complemento 300g':S.receita.nome, emo:'🥣', qtd:n300+'× pote 300g', preco:n300*P.dog300}); total+=n300*P.dog300; }
+  }
+  return {diario, semanal, itens, total};
+}
+
+function pResultado(){
+  const c=calcular();
+  const cartao=document.getElementById('cartao');
+  tituloEl.parentElement.style.display='none'; prog.style.display='none';
+  const nm=S.nome||'seu pet';
+  const consulta = (S.necessidade==='diabetes'||S.necessidade==='prescricao');
+
+  let html='<div class="res-topo">'
+    +'<div class="kicker">A cesta ideal</div>'
+    +'<h2>A semana d'+(S.especie==='gato'?'a ':'o ')+'<span class="nome">'+nm+'</span> 🧺</h2>'
+    +'<div class="estim">'
+      +'<div class="box"><div class="n">'+c.diario+' g</div><div class="l">por dia (estimado)</div></div>'
+      +'<div class="box"><div class="n">'+(c.semanal/1000).toFixed(1).replace('.',',')+' kg</div><div class="l">na semana</div></div>'
+    +'</div></div>';
+
+  html+='<div class="cesta"><h3>🧺 Sua cesta sugerida</h3><div id="itens"></div></div>';
+  html+='<div class="total"><span class="lab">Total estimado da semana</span><span class="val">R$ '+c.total.toFixed(2).replace('.',',')+'<small>/sem</small></span></div>';
+
+  if(consulta){
+    const motivo = S.necessidade==='diabetes'?'diabetes':'a prescrição do veterinário';
+    html+='<div class="nota consulta"><span class="warn">🌿</span><span>Como '+nm+' precisa de atenção com '+motivo+', o ideal é a Fauna montar uma <strong>dieta personalizada</strong> a partir da prescrição. A cesta acima é só um ponto de partida — a gente ajusta tudo no atendimento.</span></div>';
+  } else {
+    html+='<div class="nota"><span class="warn">💡</span><span>Estas quantidades são uma <strong>estimativa inicial</strong> pelo peso e pela fase. Filhotes e idosos variam bastante — se quiser, a Fauna calcula a porção exata pra '+nm+'.</span></div>';
+  }
+
+  const msg = montarMensagem(c);
+  const wppOk = /^\d{12,13}$/.test(FAUNA_WHATSAPP);
+  const href = wppOk ? ('https://wa.me/'+FAUNA_WHATSAPP+'?text='+encodeURIComponent(msg)) : '#';
+  html+='<div class="cta"><a class="btn-wpp" '+(wppOk?('href="'+href+'" target="_blank" rel="noopener"'):'href="#" onclick="return false"')+'>'
+    +'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.5 14.1c-.2.6-1.2 1.2-1.7 1.2-.4 0-1 .1-3.2-.8-2.7-1.1-4.4-3.9-4.5-4.1-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2.1.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.1.3.7 1.1 1.4 1.7.9.8 1.6 1 1.9 1.2.2.1.4.1.6-.1l.7-.8c.2-.3.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.9-.1 1.6z"/></svg>'
+    +'Finalizar no WhatsApp</a>';
+  if(!wppOk){ html+='<div class="nota" style="margin:12px 0 0"><span class="warn">⚙️</span><span>Para ativar o botão, coloque o número da Fauna em <code>FAUNA_WHATSAPP</code> no código.</span></div>'; }
+  html+='<button class="refazer" id="refazer">↻ Montar outra cesta</button></div>';
+
+  cartao.innerHTML = html + '<p style="height:6px"></p>';
+  // anima itens
+  const cont=document.getElementById('itens');
+  c.itens.forEach((it,i)=>{
+    const d=document.createElement('div'); d.className='item'; d.style.animationDelay=(i*0.09)+'s';
+    d.innerHTML='<div class="ic">'+it.emo+'</div><div class="meio"><div class="nm">'+it.nome+'</div><div class="ds">'+it.qtd+'</div></div><div class="pr">R$ '+it.preco.toFixed(2).replace('.',',')+'</div>';
+    cont.appendChild(d);
+  });
+  document.getElementById('refazer').onclick=()=>{ location.reload(); };
+}
+
+function montarMensagem(c){
+  const nm=S.nome||'meu pet';
+  const esp=S.especie==='gato'?'Gato':'Cão';
+  const linhas=c.itens.map(i=>'• '+i.qtd+' — '+i.nome).join('\n');
+  return 'Olá, Fauna! 🐾 Montei a cesta d'+(S.especie==='gato'?'a ':'o ')+nm+' pelo site.\n\n'
+    +esp+' · '+S.peso+'kg · '+ (S.fase||'') +'\n'
+    +'Necessidade: '+rotuloNecessidade()+'\n\n'
+    +'Cesta da semana:\n'+linhas+'\n'
+    +'≈ '+(c.semanal/1000).toFixed(1).replace('.',',')+'kg/semana · Total estimado R$ '+c.total.toFixed(2).replace('.',',')+'\n\n'
+    +'Podem me ajudar a finalizar o pedido?';
+}
+function rotuloNecessidade(){
+  return {nenhuma:'Nenhuma',sens:'Sensibilidade/alergia',peso:'Controle de peso',diabetes:'Diabetes',prescricao:'Prescrição do vet'}[S.necessidade]||'—';
+}
+
+render();
+</script>
+</body>
+</html>
