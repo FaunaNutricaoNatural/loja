@@ -81,6 +81,8 @@
   .btn-primario:disabled{opacity:.45; cursor:not-allowed; filter:none}
   .btn-voltar{background:transparent; color:var(--tinta-suave); padding:14px 10px}
   .btn-voltar:hover{color:var(--tinta)}
+  .btn-sec{background:#eef7f1; color:var(--verde-fundo); box-shadow:inset 0 0 0 1.5px var(--verde); flex:1}
+  .btn-sec:hover{background:#e4f1e9}
 
   /* Resultado */
   .res-topo{background:linear-gradient(180deg,var(--verde-fundo),#3c7d68); color:#fff; padding:22px 24px}
@@ -120,7 +122,7 @@
 
   .fade{animation:fade .32s ease}
   @keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
-  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important} .item{opacity:1!important; transform:none!important} .fade,.corpo{opacity:1!important}}
   @media (max-width:400px){ h1{font-size:23px} .peso-val{font-size:44px} }
 </style>
 </head>
@@ -231,7 +233,11 @@ function pNome(){
   inp.oninput=e=>S.nome=e.target.value.trim();
   inp.onkeydown=e=>{ if(e.key==='Enter') avancar(); };
   corpo.appendChild(inp);
-  corpo.appendChild(barra(true, S.nome?'Continuar':'Pular'));
+  const wrap=document.createElement('div'); wrap.className='barra';
+  const v=document.createElement('button'); v.className='btn btn-voltar'; v.textContent='Voltar'; v.onclick=voltar; wrap.appendChild(v);
+  const pular=document.createElement('button'); pular.className='btn btn-sec'; pular.textContent='Pular'; pular.onclick=()=>{ S.nome=''; avancar(); }; wrap.appendChild(pular);
+  const seguir=document.createElement('button'); seguir.className='btn btn-primario'; seguir.textContent='Seguir'; seguir.onclick=avancar; wrap.appendChild(seguir);
+  corpo.appendChild(wrap);
   setTimeout(()=>inp.focus(),120);
 }
 function pPeso(){
@@ -366,6 +372,8 @@ function pResultado(){
     d.innerHTML='<div class="ic">'+it.emo+'</div><div class="meio"><div class="nm">'+it.nome+'</div><div class="ds">'+it.qtd+'</div></div><div class="pr">R$ '+it.preco.toFixed(2).replace('.',',')+'</div>';
     cont.appendChild(d);
   });
+  // à prova de falhas: garante os itens visíveis mesmo se a animação não rodar
+  setTimeout(()=>{ document.querySelectorAll('#itens .item').forEach(el=>{ el.style.opacity='1'; el.style.transform='none'; }); }, 800);
   document.getElementById('refazer').onclick=()=>{ location.reload(); };
 }
 
